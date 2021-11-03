@@ -186,6 +186,14 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		6A39F93727332FDC00FE3328 /* Resource */ = {
+			isa = PBXGroup;
+			children = (
+				6A39F93527332D7000FE3328 /* Source.json */,
+			);
+			path = Resource;
+			sourceTree = "<group>";
+		};
 		6AFB2B4B2731FC0F005728E5 = {
 			isa = PBXGroup;
 			children = (
@@ -229,7 +237,7 @@
 		6AFB2B702731FC11005728E5 /* News appTests */ = {
 			isa = PBXGroup;
 			children = (
-				6A39F93527332D7000FE3328 /* Source.json */,
+				6A39F93727332FDC00FE3328 /* Resource */,
 				6A39F92427330EA600FE3328 /* TestError.swift */,
 				6AFB2B712731FC11005728E5 /* News_appTests.swift */,
 				6A39F92B2733149800FE3328 /* UserTest.swift */,

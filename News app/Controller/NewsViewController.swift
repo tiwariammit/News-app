@@ -18,6 +18,10 @@ class NewsViewController: UIViewController {
     
     private var isDatafectching = false //this is use to news currently fetching state
     
+    private let refreshControl = UIRefreshControl()
+    
+    private let errorView = ErrorView.init(frame: CGRect.zero)
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -41,13 +45,41 @@ class NewsViewController: UIViewController {
         
         self.view.addSubview(self.newsTableView)
         
-        self.getNews(1, isShowLoadingView: true)
+        self.getNews(1, isShowLoadingView: true, isDragPullToRefresh: false)
+        
+        self.pullToRefreshAdd()
+    }
+    
+    private func addErrroView(_ errorMessage : String){
+        self.errorView.frame = self.view.frame
+        self.errorView.center = self.view.center
+        
+        self.newsTableView.addSubview(self.errorView)
+        
+        self.errorView.lblErrorTitle.text = errorMessage
+                
+//        self.errorView.layer.zPosition = 2
+        
+    }
+    
+    private func pullToRefreshAdd(){
+        
+        self.refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        self.refreshControl.addTarget(self, action: #selector(self.dragRefresh(_:)), for: .valueChanged)
+        self.newsTableView.addSubview(self.refreshControl)
+    }
+    
+    
+    @objc func dragRefresh(_ sender: AnyObject) {
+        
+        self.getNews(1, isShowLoadingView: true, isDragPullToRefresh: true)
+        
     }
 }
 
 extension NewsViewController{
     
-    private func getNews(_ pageNumber : Int, isShowLoadingView loadView : Bool){
+    private func getNews(_ pageNumber : Int, isShowLoadingView loadView : Bool, isDragPullToRefresh pullToRefresh: Bool){
         
         let apiKey = Constants.Keys.news
                 
@@ -58,15 +90,20 @@ extension NewsViewController{
         APIManager.init(.withoutHeader, urlString: url, method: .get).handleResponse(viewController: self, loadingOnView: self.view, withLoadingColor: .app, isShowProgressHud: loadView, completionHandler: { [weak self] (response : NewsModel) in
             guard let `self` = self else { return }
             
+            if pullToRefresh{
+                self.refreshControl.endRefreshing()
+            }
             self.isDatafectching = false
             if pageNumber == 1{
                 self.articleResult = response
             }else{
+                // add the new news on the old news array
                 if let newResponse = response.articles{
                     self.articleResult?.articles?.append(contentsOf: newResponse)
                 }
             }
             
+            // increase the page number for pagination news
             self.articleResult?.nextPage = pageNumber + 1
             
             self.newsTableView.reloadData()
@@ -77,15 +114,26 @@ extension NewsViewController{
             let message = error.message ?? Errors.Apis.serverError
             self.presentErrorDialog(message)
             
-        }) { (error) in
+            if pullToRefresh{
+                self.refreshControl.endRefreshing()
+            }
+            
+        }) { [weak self] (error) in
             print(error)
+            guard let `self` = self else { return }
+            
+            if pullToRefresh{
+                self.refreshControl.endRefreshing()
+            }
+            
+            self.addErrroView(error)
         }
     }
     
     private func paginationFetchData(){
         let pageNumber = self.articleResult?.nextPage ?? 0
         
-        self.getNews(pageNumber, isShowLoadingView: false)
+        self.getNews(pageNumber, isShowLoadingView: false, isDragPullToRefresh: false)
     }
 }
 

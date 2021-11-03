@@ -41,6 +41,7 @@ class Articles : Mappable{
     var title  : String?
     var descriptionss : String?
     var urlToImage : String?
+    var publishedAt : String?
     
     required init?(map: Map) {
         
@@ -52,5 +53,7 @@ class Articles : Mappable{
         title <- map["title"]
         descriptionss <- map["description"]
         urlToImage <- map["urlToImage"]
+        publishedAt <- map["publishedAt"]
+
     }
 }

@@ -8,6 +8,7 @@
 
 import UIKit
 
+
 class NewsViewController: UIViewController {
     
     private var newsTableView = UITableView()
@@ -25,10 +26,10 @@ class NewsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-     
+        
         self.addTableView()
         self.getNews(1, isShowLoadingView: true, isDragPullToRefresh: false, isFromPagination: false)
-        
+
         self.pullToRefreshAdd()
     }
     
@@ -233,5 +234,3 @@ extension NewsViewController : UITableViewDataSource, UITableViewDelegate{
         return 1000
     }
 }
-
-

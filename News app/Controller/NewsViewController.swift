@@ -25,6 +25,15 @@ class NewsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+     
+        self.addTableView()
+        self.getNews(1, isShowLoadingView: true, isDragPullToRefresh: false)
+        
+        self.pullToRefreshAdd()
+    }
+    
+    
+    private func addTableView(){
         
         // retrieve status bar height
         let statusHeight = view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
@@ -44,27 +53,31 @@ class NewsViewController: UIViewController {
         self.newsTableView.delegate = self
         
         self.view.addSubview(self.newsTableView)
-        
-        self.getNews(1, isShowLoadingView: true, isDragPullToRefresh: false)
-        
-        self.pullToRefreshAdd()
     }
     
     private func addErrroView(_ errorMessage : String){
+        
         self.errorView.frame = self.view.frame
         self.errorView.center = self.view.center
         
-        self.newsTableView.addSubview(self.errorView)
+        self.view.addSubview(self.errorView)
         
         self.errorView.lblErrorTitle.text = errorMessage
-                
-//        self.errorView.layer.zPosition = 2
         
+        self.errorView.btnRetry.addTarget(self, action: #selector(self.btnRetryTouched), for: .touchUpInside)
+                        
+    }
+    
+    @objc private func btnRetryTouched(){
+        
+        self.errorView.removeFromSuperview()
+        self.getNews(1, isShowLoadingView: true, isDragPullToRefresh: false)
+
     }
     
     private func pullToRefreshAdd(){
         
-        self.refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        self.refreshControl.attributedTitle = NSAttributedString(string: "")
         self.refreshControl.addTarget(self, action: #selector(self.dragRefresh(_:)), for: .valueChanged)
         self.newsTableView.addSubview(self.refreshControl)
     }
@@ -118,6 +131,9 @@ extension NewsViewController{
                 self.refreshControl.endRefreshing()
             }
             
+            self.isDatafectching = false
+
+            
         }) { [weak self] (error) in
             print(error)
             guard let `self` = self else { return }
@@ -126,6 +142,8 @@ extension NewsViewController{
                 self.refreshControl.endRefreshing()
             }
             
+            self.isDatafectching = false
+
             self.addErrroView(error)
         }
     }

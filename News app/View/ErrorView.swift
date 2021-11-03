@@ -30,12 +30,16 @@ class ErrorView : UIView{
         btn.backgroundColor = .red
         btn.layer.cornerRadius = 10
         btn.layer.masksToBounds = true
+        
+        btn.translatesAutoresizingMaskIntoConstraints = false
+
         return btn
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        self.backgroundColor = .white
         self.addSubview(self.lblErrorTitle)
         self.addSubview(self.btnRetry)
     }
@@ -46,11 +50,9 @@ class ErrorView : UIView{
         let y = self.frame.height/4
         
         self.lblErrorTitle.anchor(top: topAnchor, left: leftAnchor, bottom: nil, right: nil, paddingTop: y, paddingLeft: 30, paddingBottom: 5, paddingRight: 30, width: 0, height: 0, enableInsets: false)
+                
+        self.btnRetry.anchor(top: lblErrorTitle.bottomAnchor, left: nil, bottom: nil, right: nil, centerX: self.centerXAnchor, paddingTop: 40, paddingLeft: 0, paddingBottom: 0, paddingRight: 0, width: 0, height: 0, enableInsets: false)
         
-        let x = self.bounds.width/2 - self.btnRetry.frame.width/2
-    
-        self.btnRetry.frame = CGRect(x: x, y: 50, width: self.btnRetry.frame.width, height: 50)
-
     }
     
     required init?(coder: NSCoder) {

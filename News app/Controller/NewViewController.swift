@@ -27,7 +27,7 @@ class NewViewController: UIViewController {
         self.newsTableView = UITableView(frame: CGRect(x: 0, y: statusHeight, width: viewControllerWidth, height: viewControllerHeight - statusHeight))
         
         // register cell in tableview
-        self.newsTableView.register(UITableViewCell.self, forCellReuseIdentifier: self.newsCellIdentifier)
+        self.newsTableView.register(NewsTVCell.self, forCellReuseIdentifier: self.newsCellIdentifier)
         
         self.newsTableView.dataSource = self
         self.newsTableView.delegate = self
@@ -45,17 +45,26 @@ extension NewViewController : UITableViewDataSource, UITableViewDelegate{
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
                 
-        let cell = tableView.dequeueReusableCell(withIdentifier: self.newsCellIdentifier, for: indexPath as IndexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: self.newsCellIdentifier) as! NewsTVCell
         
-        cell.textLabel!.text = "\(indexPath.row)"
+        cell.lblNewsTitle.text = "Title Lets take a look at this simple code \(indexPath.row)"
         
+        cell.lblNewsDescription.text = "\(indexPath.row) Before we'll begin, let's just remind that origin point is the Upper Left corner CGPoint of a view. An important thing to understand about views and parents"
+
         return cell
         
     }
     
    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat{
+        
+        return UITableView.automaticDimension
+    }
     
-    
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat{
+        
+        return 1000
+    }
 }
 
     

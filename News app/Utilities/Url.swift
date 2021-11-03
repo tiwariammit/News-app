@@ -17,11 +17,9 @@ enum UrlType : String{
 
 
 struct Urls {
-//    
-//https://newsapi.org/v2/everything?q=bitcoin&page=2&apiKey=de8ee8412f144e0d914f6fdac9360a87
     
     static let baseUrl = UrlType.dev.rawValue
     
-    static let news : String = baseUrl + "everything?q=bitcoin"
+    static let news : String = baseUrl + "everything?q=ios&language=en"
     
 }

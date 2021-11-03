@@ -12,7 +12,11 @@ import ObjectMapper
 class NewsModel : BaseResponse{
     
     var articles : [Articles]?
-    var currentPage : Int = 1
+    var currentPage : Int = 1 //initially page is always 1 so
+    var nextPage : Int = 2// this is to fetch the new data so i have made 1 greater then current page initially
+    var isDatafectching = false // used to pagination data
+    
+    var totalResults : Int?
     
     required init?(map: Map) {
         
@@ -24,6 +28,7 @@ class NewsModel : BaseResponse{
         super.mapping(map: map)
         
         articles <- map["articles"]
+        totalResults <- map["totalResults"]
         
     }
 }
@@ -36,7 +41,7 @@ class Articles : Mappable{
     var title  : String?
     var descriptionss : String?
     var urlToImage : String?
-   
+    
     required init?(map: Map) {
         
     }

@@ -15,9 +15,6 @@ protocol MappableExtended: Mappable{
     var statusCode : Int?{ get }
     var status : String?{ get }
     
-    var totalResults : Int?{get}
-
-    
 }
 
 class BaseResponse: MappableExtended {
@@ -27,7 +24,6 @@ class BaseResponse: MappableExtended {
     
     private var _statusCode : Int?
 
-    private var _totalResults: Int?
 
     public var message: String? {
         get {
@@ -48,12 +44,7 @@ class BaseResponse: MappableExtended {
         }
     }
     
-    public var totalResults: Int?{
-        get{
-            return _totalResults
-        }
-    }
-    
+
     public var statusCodeFromHeader: Int?
 
     required init?(map: Map) {
@@ -67,9 +58,7 @@ class BaseResponse: MappableExtended {
         if _message == nil{
             _message  <- map["message"]
         }
-        
-        _totalResults <- map["totalResults"]
-        
+                
         if _status == nil{
             var code : Int?
             code <- map["code"]

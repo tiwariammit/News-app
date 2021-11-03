@@ -27,7 +27,7 @@ class NewsViewController: UIViewController {
         // Do any additional setup after loading the view.
      
         self.addTableView()
-        self.getNews(1, isShowLoadingView: true, isDragPullToRefresh: false)
+        self.getNews(1, isShowLoadingView: true, isDragPullToRefresh: false, isFromPagination: false)
         
         self.pullToRefreshAdd()
     }
@@ -71,7 +71,7 @@ class NewsViewController: UIViewController {
     @objc private func btnRetryTouched(){
         
         self.errorView.removeFromSuperview()
-        self.getNews(1, isShowLoadingView: true, isDragPullToRefresh: false)
+        self.getNews(1, isShowLoadingView: true, isDragPullToRefresh: false, isFromPagination: false)
 
     }
     
@@ -85,14 +85,14 @@ class NewsViewController: UIViewController {
     
     @objc func dragRefresh(_ sender: AnyObject) {
         
-        self.getNews(1, isShowLoadingView: true, isDragPullToRefresh: true)
+        self.getNews(1, isShowLoadingView: true, isDragPullToRefresh: true, isFromPagination: false)
         
     }
 }
 
 extension NewsViewController{
     
-    private func getNews(_ pageNumber : Int, isShowLoadingView loadView : Bool, isDragPullToRefresh pullToRefresh: Bool){
+    private func getNews(_ pageNumber : Int, isShowLoadingView loadView : Bool, isDragPullToRefresh pullToRefresh: Bool, isFromPagination isPagination: Bool){
         
         let apiKey = Constants.Keys.news
                 
@@ -144,14 +144,16 @@ extension NewsViewController{
             
             self.isDatafectching = false
 
-            self.addErrroView(error)
+            if !isPagination{
+                self.addErrroView(error)
+            }
         }
     }
     
     private func paginationFetchData(){
         let pageNumber = self.articleResult?.nextPage ?? 0
         
-        self.getNews(pageNumber, isShowLoadingView: false, isDragPullToRefresh: false)
+        self.getNews(pageNumber, isShowLoadingView: false, isDragPullToRefresh: false, isFromPagination: true)
     }
 }
 

@@ -45,7 +45,7 @@ class NewsTVCell: UITableViewCell {
         addSubview(lblNewsDescription)
         addSubview(ivNews)
         
-        let imagewidth = self.frame.width * 0.25
+        let imagewidth = self.frame.width * 0.3
         
         ivNews.anchor(top: topAnchor, left: leftAnchor, bottom: nil, right: nil, paddingTop: 10, paddingLeft: 5, paddingBottom: 5, paddingRight: 10, width: imagewidth, height: imagewidth, enableInsets: false)
         

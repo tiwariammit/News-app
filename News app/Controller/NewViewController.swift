@@ -13,6 +13,8 @@ class NewViewController: UIViewController {
     private var newsTableView = UITableView()
     private let newsCellIdentifier = "newsCellIdentifier"
     
+    private var articles : [Articles]?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -34,23 +36,60 @@ class NewViewController: UIViewController {
         
         self.view.addSubview(self.newsTableView)
 
+        self.getNews(1)
+    }
+}
+
+extension NewViewController{
+    
+    private func getNews(_ pageNumber : Int){
+        
+        let apiKey = Constants.Keys.news
+        
+    //https://newsapi.org/v2/everything?q=bitcoin&page=2&apiKey=de8ee8412f144e0d914f6fdac9360a87
+        
+        let url = Urls.news + "&page=\(pageNumber)" + "&apiKey=" + apiKey
+        
+        APIManager.init(.withoutHeader, urlString: url, method: .get).handleResponse(viewController: self, loadingOnView: self.view, withLoadingColor: .app, completionHandler: { [weak self] (response : NewsModel) in
+            guard let `self` = self else { return }
+            
+            guard let result = response.articles else {
+                let message = response.message ?? Errors.Apis.serverError
+                self.presentErrorDialog(message)
+                return
+            }
+            
+            self.articles = result
+            self.newsTableView.reloadData()
+            
+            }, errorBlock: { [weak self] (error) in
+                guard let `self` = self else { return }
+                
+                let message = error.message ?? Errors.Apis.serverError
+                self.presentErrorDialog(message)
+        
+        }) { (error) in
+            print(error)
+        }
     }
 }
 
 extension NewViewController : UITableViewDataSource, UITableViewDelegate{
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return self.articles?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
                 
         let cell = tableView.dequeueReusableCell(withIdentifier: self.newsCellIdentifier) as! NewsTVCell
         
-        cell.lblNewsTitle.text = "Title Lets take a look at this simple code \(indexPath.row)"
+        let article = self.articles?[indexPath.row]
         
-        cell.lblNewsDescription.text = "\(indexPath.row) Before we'll begin, let's just remind that origin point is the Upper Left corner CGPoint of a view. An important thing to understand about views and parents"
-
+        cell.lblNewsTitle.text = article?.title
+        cell.lblNewsDescription.text = article?.descriptionss?.stripOutHtml()
+        cell.ivNews.setURLImage(article?.urlToImage, andPlaceHolderImage: self.placeholderSmallImage())
+        
         return cell
         
     }

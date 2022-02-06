@@ -2,7 +2,6 @@ platform :ios, '9.0'
 
 target 'News app' do
   
-pod 'AlamofireObjectMapper'
 pod 'SDWebImage' , :modular_headers => true
 
   # Pods for News app

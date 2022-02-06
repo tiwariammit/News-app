@@ -29,7 +29,7 @@ class NewsViewController: UIViewController {
         
         self.addTableView()
         self.getNews(1, isShowLoadingView: true, isDragPullToRefresh: false, isFromPagination: false)
-
+        
         self.pullToRefreshAdd()
     }
     
@@ -66,14 +66,14 @@ class NewsViewController: UIViewController {
         self.errorView.lblErrorTitle.text = errorMessage
         
         self.errorView.btnRetry.addTarget(self, action: #selector(self.btnRetryTouched), for: .touchUpInside)
-                        
+        
     }
     
     @objc private func btnRetryTouched(){
         
         self.errorView.removeFromSuperview()
         self.getNews(1, isShowLoadingView: true, isDragPullToRefresh: false, isFromPagination: false)
-
+        
     }
     
     private func pullToRefreshAdd(){
@@ -96,53 +96,60 @@ extension NewsViewController{
     private func getNews(_ pageNumber : Int, isShowLoadingView loadView : Bool, isDragPullToRefresh pullToRefresh: Bool, isFromPagination isPagination: Bool){
         
         let apiKey = Constants.Keys.news
-                
+        
         let url = Urls.news + "&page=\(pageNumber)" + "&apiKey=" + apiKey
         
         print("Url = " + url)
         
-        APIManager.init(.withoutHeader, urlString: url, method: .get).handleResponse(viewController: self, loadingOnView: self.view, withLoadingColor: .app, isShowProgressHud: loadView, completionHandler: { [weak self] (response : NewsModel) in
+        ServiceManager.init(url, withParameter: nil, method: .get, isKillAllSession: false).fetchArrayResponse(viewController: self, loadingOnView: self.view, isShowProgressHud: true, isShowNoNetBanner: true, isShowAlertBanner: true) {[weak self] (data) in
             guard let `self` = self else { return }
             
-            if pullToRefresh{
-                self.refreshControl.endRefreshing()
-            }
-            self.isDatafectching = false
-            if pageNumber == 1{
-                self.articleResult = response
-            }else{
-                // add the new news on the old news array
-                if let newResponse = response.articles{
-                    self.articleResult?.articles?.append(contentsOf: newResponse)
+            do{
+                let response = try JSONDecoder().decode(NewsModel.self, from: data)
+                
+                if pullToRefresh{
+                    self.refreshControl.endRefreshing()
                 }
+                
+                self.isDatafectching = false
+                
+                
+                if pageNumber == 1{
+                    self.articleResult = response
+                }else{
+                    // add the new news on the old news array
+                    if let newResponse = response.articles{
+                        self.articleResult?.articles?.append(contentsOf: newResponse)
+                    }
+                }
+                
+                // increase the page number for pagination news
+                self.articleResult?.nextPage = pageNumber + 1
+                
+                self.newsTableView.reloadData()
+            }catch let jsonErr {
+                print("Failed to decode:", jsonErr)
+                
             }
-            
-            // increase the page number for pagination news
-            self.articleResult?.nextPage = pageNumber + 1
-            
-            self.newsTableView.reloadData()
-            
-        }, errorBlock: { [weak self] (error) in
+        } errorBlock: { [weak self] (dataError) in
             guard let `self` = self else { return }
-            
-            let message = error.message ?? Errors.Apis.serverError
-            self.presentErrorDialog(message)
             
             if pullToRefresh{
                 self.refreshControl.endRefreshing()
             }
-            
+
             self.isDatafectching = false
 
-            
-        }) { [weak self] (error) in
-            print(error)
+            if !isPagination{
+                self.addErrroView("Error occur")
+            }
+        } failureBlock:{ [weak self] (error) in
             guard let `self` = self else { return }
             
             if pullToRefresh{
                 self.refreshControl.endRefreshing()
             }
-            
+
             self.isDatafectching = false
 
             if !isPagination{
@@ -151,11 +158,62 @@ extension NewsViewController{
         }
     }
     
-    private func paginationFetchData(){
-        let pageNumber = self.articleResult?.nextPage ?? 0
-        
-        self.getNews(pageNumber, isShowLoadingView: false, isDragPullToRefresh: false, isFromPagination: true)
-    }
+    
+    //        APIManager.init(.withoutHeader, urlString: url, method: .get).handleResponse(viewController: self, loadingOnView: self.view, withLoadingColor: .app, isShowProgressHud: loadView, completionHandler: { [weak self] (response : NewsModel) in
+    //            guard let `self` = self else { return }
+    //
+    //            if pullToRefresh{
+    //                self.refreshControl.endRefreshing()
+    //            }
+    //            self.isDatafectching = false
+    //            if pageNumber == 1{
+    //                self.articleResult = response
+    //            }else{
+    //                // add the new news on the old news array
+    //                if let newResponse = response.articles{
+    //                    self.articleResult?.articles?.append(contentsOf: newResponse)
+    //                }
+    //            }
+    //
+    //            // increase the page number for pagination news
+    //            self.articleResult?.nextPage = pageNumber + 1
+    //
+    //            self.newsTableView.reloadData()
+    //
+    //        }, errorBlock: { [weak self] (error) in
+    //            guard let `self` = self else { return }
+    //
+    //            let message = error.message ?? Errors.Apis.serverError
+    //            self.presentErrorDialog(message)
+    //
+    //            if pullToRefresh{
+    //                self.refreshControl.endRefreshing()
+    //            }
+    //
+    //            self.isDatafectching = false
+    //
+    //
+    //        }) { [weak self] (error) in
+    //            print(error)
+    //            guard let `self` = self else { return }
+    //
+    //            if pullToRefresh{
+    //                self.refreshControl.endRefreshing()
+    //            }
+    //
+    //            self.isDatafectching = false
+    //
+    //            if !isPagination{
+    //                self.addErrroView(error)
+    //            }
+    //        }
+
+
+private func paginationFetchData(){
+    let pageNumber = self.articleResult?.nextPage ?? 0
+    
+    self.getNews(pageNumber, isShowLoadingView: false, isDragPullToRefresh: false, isFromPagination: true)
+}
 }
 
 extension NewsViewController : UITableViewDataSource, UITableViewDelegate{
@@ -202,13 +260,13 @@ extension NewsViewController : UITableViewDataSource, UITableViewDelegate{
             return cell
             
         }
-       
+        
         
         let cell = tableView.dequeueReusableCell(withIdentifier: self.newsLoadingCellIdentifier) as! NewsLoadingTVCell
         
         cell.activityIndicator.startAnimating()
         cell.separatorInset = UIEdgeInsets(top: 0, left: 10000, bottom: 0, right: 0)
-
+        
         if self.isDatafectching == false{
             self.isDatafectching = true
             self.paginationFetchData()

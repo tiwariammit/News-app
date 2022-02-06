@@ -6,10 +6,9 @@
 //
 
 import Foundation
-import ObjectMapper
 
 
-class NewsModel : BaseResponse{
+class NewsModel : Decodable{
     
     var articles : [Articles]?
     var currentPage : Int = 1 //initially page is always 1 so
@@ -18,42 +17,20 @@ class NewsModel : BaseResponse{
     
     var totalResults : Int?
     
-    required init?(map: Map) {
-        
-        super.init(map:  map)
-    }
+    private enum CodingKeys: String, CodingKey { case articles } //this is usually synthesized, but we have to define it ourselves to exclude our additional variable
+
     
-    override func mapping(map: Map) {
-        
-        super.mapping(map: map)
-        
-        articles <- map["articles"]
-        totalResults <- map["totalResults"]
-        
-    }
 }
 
 
 
-class Articles : Mappable{
+
+class Articles : Decodable{
     
     var author  : String?
     var title  : String?
     var descriptionss : String?
     var urlToImage : String?
     var publishedAt : String?
-    
-    required init?(map: Map) {
-        
-    }
-    
-    func mapping(map: Map) {
-        
-        author <- map["author"]
-        title <- map["title"]
-        descriptionss <- map["description"]
-        urlToImage <- map["urlToImage"]
-        publishedAt <- map["publishedAt"]
-
-    }
+  
 }

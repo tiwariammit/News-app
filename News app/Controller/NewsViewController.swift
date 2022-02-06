@@ -137,9 +137,9 @@ extension NewsViewController{
             if pullToRefresh{
                 self.refreshControl.endRefreshing()
             }
-
+            
             self.isDatafectching = false
-
+            
             if !isPagination{
                 self.addErrroView("Error occur")
             }
@@ -149,9 +149,9 @@ extension NewsViewController{
             if pullToRefresh{
                 self.refreshControl.endRefreshing()
             }
-
+            
             self.isDatafectching = false
-
+            
             if !isPagination{
                 self.addErrroView(error)
             }
@@ -159,61 +159,11 @@ extension NewsViewController{
     }
     
     
-    //        APIManager.init(.withoutHeader, urlString: url, method: .get).handleResponse(viewController: self, loadingOnView: self.view, withLoadingColor: .app, isShowProgressHud: loadView, completionHandler: { [weak self] (response : NewsModel) in
-    //            guard let `self` = self else { return }
-    //
-    //            if pullToRefresh{
-    //                self.refreshControl.endRefreshing()
-    //            }
-    //            self.isDatafectching = false
-    //            if pageNumber == 1{
-    //                self.articleResult = response
-    //            }else{
-    //                // add the new news on the old news array
-    //                if let newResponse = response.articles{
-    //                    self.articleResult?.articles?.append(contentsOf: newResponse)
-    //                }
-    //            }
-    //
-    //            // increase the page number for pagination news
-    //            self.articleResult?.nextPage = pageNumber + 1
-    //
-    //            self.newsTableView.reloadData()
-    //
-    //        }, errorBlock: { [weak self] (error) in
-    //            guard let `self` = self else { return }
-    //
-    //            let message = error.message ?? Errors.Apis.serverError
-    //            self.presentErrorDialog(message)
-    //
-    //            if pullToRefresh{
-    //                self.refreshControl.endRefreshing()
-    //            }
-    //
-    //            self.isDatafectching = false
-    //
-    //
-    //        }) { [weak self] (error) in
-    //            print(error)
-    //            guard let `self` = self else { return }
-    //
-    //            if pullToRefresh{
-    //                self.refreshControl.endRefreshing()
-    //            }
-    //
-    //            self.isDatafectching = false
-    //
-    //            if !isPagination{
-    //                self.addErrroView(error)
-    //            }
-    //        }
-
-
-private func paginationFetchData(){
-    let pageNumber = self.articleResult?.nextPage ?? 0
-    
-    self.getNews(pageNumber, isShowLoadingView: false, isDragPullToRefresh: false, isFromPagination: true)
-}
+    private func paginationFetchData(){
+        let pageNumber = self.articleResult?.nextPage ?? 0
+        
+        self.getNews(pageNumber, isShowLoadingView: false, isDragPullToRefresh: false, isFromPagination: true)
+    }
 }
 
 extension NewsViewController : UITableViewDataSource, UITableViewDelegate{
